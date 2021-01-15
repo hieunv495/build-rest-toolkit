@@ -1,4 +1,4 @@
-# Build this project
+# How to make this project
 
 ## Step 1. Init project
 
