@@ -4,18 +4,38 @@ process.env.NODE_ENV = "test";
 //Require the dev-dependencies
 import * as chai from "chai";
 import "chai-http";
-import server from "./server";
+import { connect, close } from "./server";
+
+import * as mongoose from "mongoose";
+const Post = mongoose.model("Post");
 
 let should = chai.should();
 
 chai.use(require("chai-http"));
 
+let server;
+
 //Our parent block
 describe("Pets", () => {
-  beforeEach((done) => {
-    //Before each test we empty the database in your case
-    done();
+  before(async () => {
+    const result = await connect();
+    server = result.server;
   });
+  after(async () => {
+    await close();
+    console.log("closed");
+  });
+  beforeEach(async () => {
+    //Before each test we empty the database in your case
+    await Post.deleteMany({});
+    for (let i = 0; i < 10; i++) {
+      await Post.create({
+        title: "Post " + i,
+        description: "any " + i,
+      });
+    }
+  });
+
   /*
    * Test the /GET route
    */
@@ -27,7 +47,7 @@ describe("Pets", () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("array");
-          res.body.length.should.be.eql(5); // fixme :)
+          res.body.length.should.be.eql(10); // fixme :)
           done();
         });
     });

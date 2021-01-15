@@ -105,7 +105,7 @@ Add to package.json
 ```json
 {
   "scripts": {
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.test.ts'"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha --timeout 10000 -r ts-node/register 'test/**/*.test.ts'"
   }
 }
 ```
@@ -115,11 +115,3 @@ Add to package.json
 ### References
 
 - https://viblo.asia/p/unit-test-cho-nodejs-restful-api-voi-mocha-va-chai-bWrZnLAv5xw
-
-### Content
-
-Create _test/server/index.ts_
-
-```
-
-```
