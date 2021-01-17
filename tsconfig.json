@@ -3,7 +3,8 @@
     "declaration": true,
     "declarationDir": "./dist",
     "module": "es6",
-    // "noImplicitAny": true,
+    "moduleResolution": "Node",
+    "noImplicitAny": true,
     "outDir": "./dist",
     "target": "es5"
   },

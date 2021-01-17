@@ -38,7 +38,7 @@ const connect = async () => {
   server = app.listen(port);
   db = await connectDB();
   console.log("Listening on port " + port);
-  return { server, db };
+  return { server, db, app };
 };
 
 const close = async () => {

@@ -1,3 +1,3 @@
-export const myFunc = (text: string) => {
-  console.log(text);
-};
+import buildGetListHandler from "./crud/buildGetListHandler";
+
+export { buildGetListHandler };

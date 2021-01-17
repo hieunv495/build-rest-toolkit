@@ -7,13 +7,14 @@ import "chai-http";
 import { connect, close } from "./server";
 
 import * as mongoose from "mongoose";
+import { Server } from "http";
 const Post = mongoose.model("Post");
 
 let should = chai.should();
 
 chai.use(require("chai-http"));
 
-let server;
+let server: Server;
 
 //Our parent block
 describe("Pets", () => {
