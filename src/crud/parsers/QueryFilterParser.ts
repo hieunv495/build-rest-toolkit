@@ -63,7 +63,6 @@ export default class QueryFilterParser {
 
   parse = async (req: Request) => {
     let filter: { [key: string]: any } = {};
-    console.log(this.fields);
     for (let field of this.fields) {
       if (typeof field === "function") {
         // Function

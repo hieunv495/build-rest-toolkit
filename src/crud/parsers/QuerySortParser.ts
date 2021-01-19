@@ -6,15 +6,17 @@ export type QuerySortParserConfig = {
 };
 
 export default class QuerySortParser {
+  DEFAULT_QUERY_FIELD = "sort";
   queryField: string;
   fields: string[];
   constructor(config: QuerySortParserConfig) {
-    this.queryField = config.queryField;
+    this.queryField = config.queryField || this.DEFAULT_QUERY_FIELD;
     this.fields = config.fields;
   }
 
   parse = (req: Request): any => {
     const data = req.query[this.queryField] as string;
+    if (!data) return undefined;
 
     // '   1, 2, 3 ' => ['1', '2', '3']
     let tokens = data
