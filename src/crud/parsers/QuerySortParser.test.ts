@@ -5,9 +5,7 @@ import { Request } from "express";
 import QuerySortParser from "./QuerySortParser";
 let should = chai.should();
 
-let sortParser = new QuerySortParser({
-  fields: ["number", "createdAt"],
-});
+let sortParser = new QuerySortParser(["number", "createdAt"]);
 
 //Our parent block
 describe("QuerySortParser", () => {
@@ -58,6 +56,19 @@ describe("QuerySortParser", () => {
       query: { sort: "number , number-other ,-createdAt" },
     } as unknown) as Request;
     const result = await sortParser.parse(req);
+    expect(result).equal("number -createdAt");
+  });
+
+  it("with custom query field should return value", async () => {
+    let sortParser2 = new QuerySortParser({
+      queryField: "custom-sort",
+      fields: ["number", "createdAt"],
+    });
+
+    const req = ({
+      query: { "custom-sort": "number , number-other ,-createdAt" },
+    } as unknown) as Request;
+    const result = await sortParser2.parse(req);
     expect(result).equal("number -createdAt");
   });
 });

@@ -1,17 +1,24 @@
 import { Request } from "express";
 
-export type QuerySortParserConfig = {
-  queryField?: string;
-  fields: string[];
-};
+export type QuerySortParserConfig =
+  | string[]
+  | {
+      queryField?: string;
+      fields: string[];
+    };
 
 export default class QuerySortParser {
   DEFAULT_QUERY_FIELD = "sort";
   queryField: string;
   fields: string[];
   constructor(config: QuerySortParserConfig) {
-    this.queryField = config.queryField || this.DEFAULT_QUERY_FIELD;
-    this.fields = config.fields;
+    if (config instanceof Array) {
+      this.queryField = this.DEFAULT_QUERY_FIELD;
+      this.fields = config;
+    } else {
+      this.queryField = config.queryField || this.DEFAULT_QUERY_FIELD;
+      this.fields = config.fields;
+    }
   }
 
   parse = (req: Request): any => {

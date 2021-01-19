@@ -20,7 +20,7 @@ const sleep = (time: number) =>
 const getPostList = buildGetList({
   model: Post,
   defaultSort: "number",
-  querySort: { fields: ["title", "views", "createdAt"] },
+  querySort: ["title", "views", "createdAt"],
 });
 
 testServer.app.get("/posts", getPostList);
