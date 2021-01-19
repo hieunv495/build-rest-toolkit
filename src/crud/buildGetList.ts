@@ -6,6 +6,9 @@ import QueryFilterParser, {
 import QueryPaginationParser, {
   PaginationParserConfig,
 } from "./parsers/QueryPaginationParser";
+import QueryPopulateParser, {
+  QueryPopulateParserConfig,
+} from "./parsers/QueryPopulateParser";
 import QuerySortParser, {
   QuerySortParserConfig,
 } from "./parsers/QuerySortParser";
@@ -18,6 +21,7 @@ const buildGetList = ({
   querySort,
   pagination,
   defaultPopulate,
+  queryPopulate,
   queryChain,
 }: {
   model: string | mongoose.Model<mongoose.Document<any>>;
@@ -27,6 +31,7 @@ const buildGetList = ({
   querySort?: QuerySortParserConfig;
   pagination?: PaginationParserConfig;
   defaultPopulate?: any;
+  queryPopulate?: QueryPopulateParserConfig;
   queryChain?: (
     query: mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>
   ) => mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>;
@@ -50,6 +55,11 @@ const buildGetList = ({
   let querySortParser: QuerySortParser;
   if (querySort) {
     querySortParser = new QuerySortParser(querySort);
+  }
+
+  let queryPopulateParser: QueryPopulateParser;
+  if (queryPopulate) {
+    queryPopulateParser = new QueryPopulateParser(queryPopulate);
   }
 
   return async (req: Request, res: Response) => {
@@ -83,12 +93,20 @@ const buildGetList = ({
         getItems = getItems.sort(defaultSort);
       }
 
-      // Populate
+      // Default Populate
       if (defaultPopulate) {
         if (typeof defaultPopulate === "function") {
           defaultPopulate = await defaultPopulate(req);
         }
         getItems = getItems.populate(defaultPopulate);
+      }
+
+      // Query Populate
+      if (queryPopulate) {
+        const parsedPopulateData = queryPopulateParser.parse(req);
+        if (parsedPopulateData) {
+          getItems = getItems.populate(parsedPopulateData);
+        }
       }
 
       // Query chain

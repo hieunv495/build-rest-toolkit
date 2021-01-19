@@ -6,6 +6,21 @@ const postSchema = new mongoose.Schema(
     description: String,
     number: Number,
     views: Number,
+    category1: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+
+    category2: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+
+    category3: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+
     deleted: {
       type: Boolean,
       default: false,
