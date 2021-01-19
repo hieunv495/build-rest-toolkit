@@ -48,6 +48,29 @@ describe("Test filter", () => {
   });
 
   describe("Filter", () => {
+    it("default filter should return items", (done) => {
+      const expectedItems = Array(100)
+        .fill(null)
+        .map((_, i) => i)
+        .filter((item) => item < 50);
+
+      chai
+        .request(testServer.server)
+        .get("/posts")
+        .end((err, res) => {
+          res.should.have.status(200);
+          const body = res.body;
+          body.should.be.a("object");
+          body.total.should.be.eql(expectedItems.length);
+          body.items.should.be.a("array");
+          body.items.length.should.be.eql(expectedItems.length);
+          body.items
+            .map((item: any) => item.number)
+            .should.be.eql(expectedItems);
+          done();
+        });
+    });
+
     it("normal filter should return items", (done) => {
       chai
         .request(testServer.server)
