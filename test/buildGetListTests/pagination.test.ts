@@ -4,9 +4,9 @@ process.env.NODE_ENV = "test";
 //Require the dev-dependencies
 import * as chai from "chai";
 import "chai-http";
-import { buildGetListHandler } from "../src/index";
-import Post from "./server/models/post.model";
-import TestServer from "./server/TestServer";
+import { buildGetList } from "../../src/index";
+import Post from "../../server/models/post.model";
+import TestServer from "../../server/TestServer";
 
 let should = chai.should();
 
@@ -17,9 +17,9 @@ const testServer = new TestServer();
 const sleep = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time));
 
-const getPostList = buildGetListHandler({
+const getPostList = buildGetList({
   model: Post,
-  filter: [{ field: "title", search: true }, "description"],
+  queryFilter: ["title", { field: "description", search: true }],
   sort: [["number", 1]],
   pagination: {
     defaultLimit: 5,
@@ -44,7 +44,7 @@ describe("Build get list", () => {
       await Post.create({
         number: i,
         title: "Post " + i,
-        description: "any " + i,
+        description: "Description " + i,
       });
     }
   });
@@ -375,43 +375,25 @@ describe("Build get list", () => {
           done();
         });
     });
-  });
 
-  describe("Filter", () => {
-    it("it filter title should return items that title contains '1'", (done) => {
+    it("combine limit and offset should return items", (done) => {
       chai
         .request(testServer.server)
-        .get("/posts?title=1")
+        .get("/posts?offset=1&limit=10")
         .end((err, res) => {
-          // console.log(res.body);
-          const body = res.body;
           res.should.have.status(200);
+          const body = res.body;
           body.should.be.a("object");
-          body.total.should.be.eql(19);
+          body.total.should.be.eql(100);
           body.items.should.be.a("array");
-          body.items.length.should.be.eql(5);
+          body.items.length.should.be.eql(10);
           body.items
             .map((item: any) => item.number)
-            .should.be.eql([1, 10, 11, 12, 13]);
-          done();
-        });
-    });
-
-    it("it filter title page 2 should return items that title contains '1' page 2", (done) => {
-      chai
-        .request(testServer.server)
-        .get("/posts?title=1&page=2")
-        .end((err, res) => {
-          // console.log(res.body);
-          const body = res.body;
-          res.should.have.status(200);
-          body.should.be.a("object");
-          body.total.should.be.eql(19);
-          body.items.should.be.a("array");
-          body.items.length.should.be.eql(5);
-          body.items
-            .map((item: any) => item.number)
-            .should.be.eql([14, 15, 16, 17, 18]);
+            .should.be.eql(
+              Array(10)
+                .fill(null)
+                .map((_, i) => i + 1)
+            );
           done();
         });
     });

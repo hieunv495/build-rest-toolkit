@@ -1,3 +1,3 @@
-import buildGetListHandler from "./crud/buildGetListHandler";
+import buildGetList from "./crud/buildGetList";
 
-export { buildGetListHandler };
+export { buildGetList };

@@ -3,9 +3,9 @@ import * as mongoose from "mongoose";
 import FilterParser, { FilterParserConfig } from "./FilterParser";
 import PaginationParser, { PaginationParserConfig } from "./PaginationParser";
 
-const buildGetListHandler = ({
+const buildGetList = ({
   model,
-  filter,
+  queryFilter,
   defaultFilter,
   sort,
   pagination,
@@ -13,7 +13,7 @@ const buildGetListHandler = ({
   queryChain,
 }: {
   model: string | mongoose.Model<mongoose.Document<any>>;
-  filter?: FilterParserConfig;
+  queryFilter?: FilterParserConfig;
   defaultFilter?: { [key: string]: any };
   sort?: any;
   pagination?: PaginationParserConfig;
@@ -25,16 +25,22 @@ const buildGetListHandler = ({
   const finalModel: mongoose.Model<mongoose.Document<any>> =
     typeof model === "string" ? mongoose.model(model) : model;
 
-  const paginationParser = new PaginationParser(pagination);
-  const filterParser = new FilterParser(filter);
+  let paginationParser: PaginationParser;
+  if (pagination) {
+    paginationParser = new PaginationParser(pagination);
+  }
+  let queryFilterParser: FilterParser;
+  if (queryFilter) {
+    queryFilterParser = new FilterParser(queryFilter);
+  }
 
   return async (req: Request, res: Response) => {
     try {
       let finalFilter: { [key: string]: any } = defaultFilter || {};
 
       // Filter
-      if (filter) {
-        const parsedFilter = await filterParser.parse(req);
+      if (queryFilter) {
+        const parsedFilter = await queryFilterParser.parse(req);
         finalFilter = { ...finalFilter, ...(await parsedFilter) };
       }
 
@@ -76,9 +82,10 @@ const buildGetListHandler = ({
 
       return res.json({ items, total });
     } catch (error) {
+      // console.error(error);
       res.status(error.status || 512).json({ message: error.message });
     }
   };
 };
 
-export default buildGetListHandler;
+export default buildGetList;

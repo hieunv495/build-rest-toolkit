@@ -4,7 +4,7 @@ process.env.NODE_ENV = "test";
 //Require the dev-dependencies
 import * as chai from "chai";
 import "chai-http";
-import { connect, close } from "./server";
+import { connect, close } from "../server";
 
 import * as mongoose from "mongoose";
 import { Server } from "http";

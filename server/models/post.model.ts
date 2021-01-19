@@ -5,6 +5,10 @@ const postSchema = new mongoose.Schema(
     title: String,
     description: String,
     number: Number,
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
