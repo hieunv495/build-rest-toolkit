@@ -1,20 +1,24 @@
 import { Request, Response } from "express";
 import * as mongoose from "mongoose";
-import FilterParser, { FilterParserConfig } from "./FilterParser";
-import PaginationParser, { PaginationParserConfig } from "./PaginationParser";
+import QueryFilterParser, {
+  FilterParserConfig,
+} from "./parsers/QueryFilterParser";
+import QueryPaginationParser, {
+  PaginationParserConfig,
+} from "./parsers/QueryPaginationParser";
 
 const buildGetList = ({
   model,
-  queryFilter,
   defaultFilter,
+  queryFilter,
   sort,
   pagination,
   populate,
   queryChain,
 }: {
   model: string | mongoose.Model<mongoose.Document<any>>;
-  queryFilter?: FilterParserConfig;
   defaultFilter?: { [key: string]: any };
+  queryFilter?: FilterParserConfig;
   sort?: any;
   pagination?: PaginationParserConfig;
   populate?: any;
@@ -25,13 +29,17 @@ const buildGetList = ({
   const finalModel: mongoose.Model<mongoose.Document<any>> =
     typeof model === "string" ? mongoose.model(model) : model;
 
-  let paginationParser: PaginationParser;
+  let queryPaginationParser: QueryPaginationParser;
   if (pagination) {
-    paginationParser = new PaginationParser(pagination);
+    if (pagination === true) {
+      queryPaginationParser = new QueryPaginationParser();
+    } else {
+      queryPaginationParser = new QueryPaginationParser(pagination);
+    }
   }
-  let queryFilterParser: FilterParser;
+  let queryFilterParser: QueryFilterParser;
   if (queryFilter) {
-    queryFilterParser = new FilterParser(queryFilter);
+    queryFilterParser = new QueryFilterParser(queryFilter);
   }
 
   return async (req: Request, res: Response) => {
@@ -49,7 +57,7 @@ const buildGetList = ({
 
       // Pagination
       if (pagination) {
-        const { limit, offset } = await paginationParser.parse(req);
+        const { limit, offset } = await queryPaginationParser.parse(req);
         getItems = getItems.skip(offset).limit(limit);
       }
 

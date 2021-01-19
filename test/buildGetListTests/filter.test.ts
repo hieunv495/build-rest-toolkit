@@ -38,7 +38,7 @@ describe("Test filter", () => {
         number: i,
         title: "Post " + i,
         description: "Description " + i,
-        delected: i < 50 ? false : true,
+        deleted: i < 50 ? false : true,
       });
     }
   });
@@ -49,10 +49,9 @@ describe("Test filter", () => {
 
   describe("Filter", () => {
     it("default filter should return items", (done) => {
-      const expectedItems = Array(100)
+      const expectedItems = Array(50)
         .fill(null)
-        .map((_, i) => i)
-        .filter((item) => item < 50);
+        .map((_, i) => i);
 
       chai
         .request(testServer.server)
@@ -104,7 +103,7 @@ describe("Test filter", () => {
 
     it("search filter should return items", (done) => {
       const searchText = "1";
-      const expectedItems = Array(100)
+      const expectedItems = Array(50)
         .fill(null)
         .map((_, i) => i + "")
         .filter((item) => item.includes(searchText))

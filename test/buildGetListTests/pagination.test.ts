@@ -19,8 +19,6 @@ const sleep = (time: number) =>
 
 const getPostList = buildGetList({
   model: Post,
-  queryFilter: ["title", { field: "description", search: true }],
-  sort: [["number", 1]],
   pagination: {
     defaultLimit: 5,
   },

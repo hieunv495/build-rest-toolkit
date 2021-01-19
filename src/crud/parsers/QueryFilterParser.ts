@@ -22,45 +22,48 @@ export type FilterField =
     }
   | ((req: Request) => any | Promise<any>);
 
-export default class FilterParser {
+export default class QueryFilterParser {
   fields: FilterField[];
 
   constructor(config: FilterParserConfig) {
-    this.fields = config.map((field) => {
-      if (typeof field === "string") {
-        return <FilterField>{
-          field: {
-            queryField: field,
-            modelField: field,
-          },
-          search: false,
-        };
-      } else if (typeof field === "function") {
-        return field;
-      } else if (typeof field.field === "string") {
-        return <FilterField>{
-          field: {
-            queryField: field.field,
-            modelField: field.field,
-          },
-          search: !!field.search,
-        };
-      } else if (typeof field.field === "object") {
-        return <FilterField>{
-          field: {
-            queryField: field.field.queryField,
-            modelField: field.field.modelField,
-          },
-          search: !!field.search,
-        };
-      } else {
-        throw new Error("Invalid config");
-      }
-    });
+    this.fields = config
+      .filter((v) => v)
+      .map((field) => {
+        if (typeof field === "string") {
+          return <FilterField>{
+            field: {
+              queryField: field,
+              modelField: field,
+            },
+            search: false,
+          };
+        } else if (typeof field === "function") {
+          return field;
+        } else if (typeof field.field === "string") {
+          return <FilterField>{
+            field: {
+              queryField: field.field,
+              modelField: field.field,
+            },
+            search: !!field.search,
+          };
+        } else if (typeof field.field === "object") {
+          return <FilterField>{
+            field: {
+              queryField: field.field.queryField,
+              modelField: field.field.modelField,
+            },
+            search: !!field.search,
+          };
+        } else {
+          throw new Error("Invalid config");
+        }
+      });
   }
 
   parse = async (req: Request) => {
     let filter: { [key: string]: any } = {};
+    console.log(this.fields);
     for (let field of this.fields) {
       if (typeof field === "function") {
         // Function

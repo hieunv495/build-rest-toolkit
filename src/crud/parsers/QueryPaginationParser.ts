@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { off } from "process";
 
 export type PaginationParserConfig = {
   getLimit?: (req: Request) => number | Promise<number>;
@@ -72,7 +71,7 @@ const buildGetOffset = ({
   }
 };
 
-export default class PaginationParser {
+export default class QueryPaginationParser {
   DEFAULT_LIMIT = 10;
   DEFAULT_OFFSET = 0;
   config: PaginationParserConfig;
@@ -83,8 +82,8 @@ export default class PaginationParser {
   getLimit: (req: Request) => number | Promise<number>;
   getOffset: (req: Request) => number | Promise<number>;
 
-  constructor(config: true | PaginationParserConfig) {
-    if (config === true) {
+  constructor(config?: PaginationParserConfig) {
+    if (!config) {
       this.defaultLimit = this.DEFAULT_LIMIT;
       this.defaultOffset = this.DEFAULT_OFFSET;
       this.getLimit = buildGetLimit();

@@ -1,6 +1,6 @@
 const Schema = require("validate");
 const completeSlug = require("../../utils/completeSlug");
-const PaginationParser = require("./PaginationParser");
+const PaginationParser = require("./parsers/QueryPaginationParser");
 const SearchParser = require("./SearchParser");
 
 const slugSchema = new Schema({
