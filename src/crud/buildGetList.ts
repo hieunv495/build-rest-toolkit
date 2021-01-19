@@ -6,22 +6,27 @@ import QueryFilterParser, {
 import QueryPaginationParser, {
   PaginationParserConfig,
 } from "./parsers/QueryPaginationParser";
+import QuerySortParser, {
+  QuerySortParserConfig,
+} from "./parsers/QuerySortParser";
 
 const buildGetList = ({
   model,
   defaultFilter,
   queryFilter,
-  sort,
+  defaultSort,
+  querySort,
   pagination,
-  populate,
+  defaultPopulate,
   queryChain,
 }: {
   model: string | mongoose.Model<mongoose.Document<any>>;
   defaultFilter?: { [key: string]: any };
   queryFilter?: FilterParserConfig;
-  sort?: any;
+  defaultSort?: any;
+  querySort?: QuerySortParserConfig;
   pagination?: PaginationParserConfig;
-  populate?: any;
+  defaultPopulate?: any;
   queryChain?: (
     query: mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>
   ) => mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>;
@@ -40,6 +45,11 @@ const buildGetList = ({
   let queryFilterParser: QueryFilterParser;
   if (queryFilter) {
     queryFilterParser = new QueryFilterParser(queryFilter);
+  }
+
+  let querySortParser: QuerySortParser;
+  if (querySort) {
+    querySortParser = new QuerySortParser(querySort);
   }
 
   return async (req: Request, res: Response) => {
@@ -62,19 +72,23 @@ const buildGetList = ({
       }
 
       // Sort
-      if (sort) {
-        if (typeof sort === "function") {
-          sort = await sort(req);
+      if (querySort) {
+        const parsedSortData = querySortParser.parse(req);
+        if (parsedSortData) {
+          getItems = getItems.sort(parsedSortData);
+        } else if (defaultSort) {
+          getItems = getItems.sort(defaultSort);
         }
-        getItems = getItems.sort(sort);
+      } else if (defaultSort) {
+        getItems = getItems.sort(defaultSort);
       }
 
       // Populate
-      if (populate) {
-        if (typeof populate === "function") {
-          populate = await populate(req);
+      if (defaultPopulate) {
+        if (typeof defaultPopulate === "function") {
+          defaultPopulate = await defaultPopulate(req);
         }
-        getItems = getItems.populate(populate);
+        getItems = getItems.populate(defaultPopulate);
       }
 
       // Query chain
