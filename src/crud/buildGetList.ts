@@ -22,7 +22,7 @@ const buildGetList = ({
   pagination,
   defaultPopulate,
   queryPopulate,
-  queryChain,
+  getItemsQueryChain,
 }: {
   model: string | mongoose.Model<mongoose.Document<any>>;
   defaultFilter?: { [key: string]: any };
@@ -32,7 +32,7 @@ const buildGetList = ({
   pagination?: PaginationParserConfig;
   defaultPopulate?: any;
   queryPopulate?: QueryPopulateParserConfig;
-  queryChain?: (
+  getItemsQueryChain?: (
     query: mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>
   ) => mongoose.Query<mongoose.Document<any>[], mongoose.Document<any>>;
 }) => {
@@ -75,6 +75,11 @@ const buildGetList = ({
       // Main Query
       let getItems = finalModel.find(finalFilter);
 
+      // Query chain
+      if (getItemsQueryChain) {
+        getItems = getItemsQueryChain(getItems);
+      }
+
       // Pagination
       if (pagination) {
         const { limit, offset } = await queryPaginationParser.parse(req);
@@ -107,11 +112,6 @@ const buildGetList = ({
         if (parsedPopulateData) {
           getItems = getItems.populate(parsedPopulateData);
         }
-      }
-
-      // Query chain
-      if (queryChain && typeof queryChain === "function") {
-        getItems = queryChain(getItems);
       }
 
       // Count items
