@@ -4,9 +4,9 @@ process.env.NODE_ENV = "test";
 //Require the dev-dependencies
 import * as chai from "chai";
 import "chai-http";
-import { buildGetList } from "../../src/index";
-import Post from "../../server/models/post.model";
-import TestServer from "../../server/TestServer";
+import { buildGetList } from "../../index";
+import Post from "../../../server/models/post.model";
+import TestServer from "../../../server/TestServer";
 
 let should = chai.should();
 
